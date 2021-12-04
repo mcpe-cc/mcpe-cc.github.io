@@ -1,0 +1,841 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<html lang="zh-cn">
+<!-- 
+Github@NiceSprite34
+ --> 
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <title>随身WIFI</title>
+    <link rel="stylesheet" href="./assets/css/mdui.min.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <script type="text/javascript" src="./assets/js/mdui.min.js"></script>
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script src="js/webkey.common.js"></script>
+   <script src="js/device_status.js"></script>
+ <!--DESK JavaScript-->
+     <script src="js/webkey.common.js"></script>
+     <script src="js/device_status.js"></script>
+     <script src="js/pinDialog.js"></script>
+     <script src="js/desk.js"></script>
+     <script type="text/javascript" src="js/json2.js"></script>
+     
+     <style>
+ .boxx {
+	background-color: rgba(204,204,204,0.5);
+}
+ .margin{		      
+      margin: 15px 30px;
+      background-color: rgba(204,204,204,0.5);
+         }
+ .upward{
+      border-radius: 10px;
+   }
+     </style>
+
+<!-- 系统运行时间-->
+<script type="text/javascript">
+	
+	window.onload = function(){
+    //setTimeout("refreshStatus();", 1000);
+    setInterval("refreshStatus();", 1000);
+	};
+	
+	function refreshStatus()
+	{		
+		$.each($(".RunningTime"),function(key,val)
+		{
+			var id = $(val).attr('id');
+			var spanid = id+"Span";
+			if ($(val).children("span").length == 0)
+				$(val).append('<b><span class="strong" id="'+spanid+'"></span></b>');
+						
+			  sl4a(id,[], function(data){
+			  	var total = data.result;
+			  	var days = parseInt(total/(24*3600), 10);
+			  	var temp = parseInt(total%(24*3600), 10);
+			  	var hours = parseInt(temp/3600, 10);
+			  	temp = parseInt(temp%3600, 10);
+			  	var minutes = parseInt(temp/60, 10);
+			  	var seconds = parseInt(temp%60, 10);
+			  	if(10 > hours) hours = '0' + hours;
+			  	if(10 > minutes) minutes = '0' + minutes;	
+			  	if(10 > seconds) seconds = '0' + seconds;			  	
+			  	var time = days + "`days`" + ' ' + hours + ':' + minutes + ':' + seconds;
+			  	
+				$('#'+spanid).text(time);
+				});
+		});
+	}
+	
+</script>
+<!-- 信号状态 -->
+<script type="text/javascript">
+		var NoSimText = "`No (U)SIM`";
+		var LTE = "4G";
+		var PinRequiredText = "`PIN required`";
+		var PukRequiredText = "`PUK required`";
+		var NetworkLockedText = "`Network Locked`";
+		var ChargingText = "`Charging...`";
+		var CurrentClientNum = "`Current Client Number`";
+		var LanConnected = "`Lan Connected`";
+		var FourGConnected = "`4G Connected`";
+		var ThreeGConnected = "`3G Connected`";
+		var TwoGConnected = "`2G Connected`";
+		var GPRSConnected = "`GPRS Connected`";
+		var Connected = "`Connected`";
+		var SignalStrength = "`Signal Strength`";
+		var Operator_name = "`Operator Name`";
+		var Network_type = "`Network Type`"; 
+		var ChargeCompleteText = "`Charge complete`";
+		
+		function setCookie(c_name,value,expiredays)
+		{
+			var exdate=new Date();
+			
+			exdate.setDate(exdate.getDate()+expiredays);
+			document.cookie=c_name+ "=" +escape(value)+
+				((expiredays==null) ? "" : ";expires="+exdate.toUTCString());
+		}
+		
+		function getCookie(cookie_name)
+		{
+			var results = document.cookie.match('(^|;) ?' + cookie_name + '=([^;]*)(;|$)');
+			
+			if (results)
+				return (unescape(results[2]));
+			else
+				return null;
+		}
+			
+		function changelanguage(){
+			// changtest();
+			var lan = document.getElementById("lang").value;
+			
+			setCookie('lang',lan,365);
+			refreshFrames();
+			//sendmakeRequest('changelanguage',lan);
+			
+			
+		}
+
+		function refreshFrames()
+		{
+			window.location.reload();
+			window.parent.frames.bottom.location = window.parent.frames.bottom.location;
+			
+			if (null == window.parent.frames.desk.frames.menu)
+			{
+				window.parent.frames.desk.location = window.parent.frames.desk.location;
+			}
+			else
+			{
+				window.parent.frames.desk.frames.menu.location = window.parent.frames.desk.frames.menu.location;
+				window.parent.frames.desk.frames.desk2.location = window.parent.frames.desk.frames.desk2.location;
+			}
+		}
+
+		function onSkinChinese()
+		{
+			setCookie('lang','zh',365);
+			refreshFrames();
+		}
+		
+		function onSkinEnglish()
+		{
+			setCookie('lang','en',30);
+			refreshFrames();
+		}
+		
+		function onHelp()
+		{
+			var lang = getCookie('lang');
+
+			if("zh" == lang)
+			{
+				//window.open('help_ch.html');
+				window.open('./USER_Manual_ch.pdf');
+			}
+			else
+			{
+				//window.open('help_en.html');
+				window.open('./USER_Manual_en.pdf');
+			}
+		}
+		
+		function logout()
+		{
+      if(confirm('`Are you sure to exit?`'))
+      {
+         var browserName=navigator.appName;
+         if (browserName=="Netscape")
+         {
+           window.open('', '_self', '');
+           window.close();
+         }
+         
+         if (browserName=="Microsoft Internet Explorer") 
+         { 
+           window.parent.opener = "whocares"; 
+           window.parent.close(); 
+         }
+      }
+		}
+		
+			
+			
+	//window.onload = initLang();
+		
+</script>
+
+<script type="text/javascript">
+		var NoSimText = "`No (U)SIM`";
+		var PinRequiredText = "`PIN required`";
+		var PukRequiredText = "`PUK required`";
+		var NetworkLockedText = "`Network Locked`";
+		var ChargingText = "`Charging...`";
+		var CurrentClientNum = "`Current Client Number`";
+		var LanConnected = "`Lan Connected`";
+		var FourGConnected = "`4G Connected`";
+		var ThreeGConnected = "`3G Connected`";
+		var TwoGConnected = "`2G Connected`";
+		var GPRSConnected = "`GPRS Connected`";
+		var Connected = "`Connected`";
+		var SignalStrength = "`Signal Strength`";
+		var Operator_name = "`Operator Name`";
+		var Network_type = "`Network Type`"; 
+		var ChargeCompleteText = "`Charge complete`";
+		
+		function setCookie(c_name,value,expiredays)
+		{
+			var exdate=new Date();
+			
+			exdate.setDate(exdate.getDate()+expiredays);
+			document.cookie=c_name+ "=" +escape(value)+
+				((expiredays==null) ? "" : ";expires="+exdate.toUTCString());
+		}
+		
+		function getCookie(cookie_name)
+		{
+			var results = document.cookie.match('(^|;) ?' + cookie_name + '=([^;]*)(;|$)');
+			
+			if (results)
+				return (unescape(results[2]));
+			else
+				return null;
+		}
+			
+		function changelanguage(){
+			// changtest();
+			var lan = document.getElementById("lang").value;
+			
+			setCookie('lang',lan,365);
+			refreshFrames();
+			//sendmakeRequest('changelanguage',lan);
+			
+			
+		}
+
+		function refreshFrames()
+		{
+			window.location.reload();
+			window.parent.frames.bottom.location = window.parent.frames.bottom.location;
+			
+			if (null == window.parent.frames.desk.frames.menu)
+			{
+				window.parent.frames.desk.location = window.parent.frames.desk.location;
+			}
+			else
+			{
+				window.parent.frames.desk.frames.menu.location = window.parent.frames.desk.frames.menu.location;
+				window.parent.frames.desk.frames.desk2.location = window.parent.frames.desk.frames.desk2.location;
+			}
+		}
+
+		function onSkinChinese()
+		{
+			setCookie('lang','zh',365);
+			refreshFrames();
+		}
+		
+		function onSkinEnglish()
+		{
+			setCookie('lang','en',30);
+			refreshFrames();
+		}
+				
+		function logout()
+		{
+      if(confirm('`Are you sure to exit?`'))
+      {
+         var browserName=navigator.appName;
+         if (browserName=="Netscape")
+         {
+           window.open('', '_self', '');
+           window.close();
+         }
+         
+         if (browserName=="Microsoft Internet Explorer") 
+         { 
+           window.parent.opener = "whocares"; 
+           window.parent.close(); 
+         }
+      }
+		}
+	//window.onload = initLang();
+</script>
+
+<script type="text/javascript">
+	var UnlockSimPinTitle = "`Unlock SIM/RUIM card`";
+	var UnlockSimPinTip = "`Please input PIN`:";
+	var UnlockSimPinTipErr = "`PIN error,attempts remaining`: ";
+	var UnlockSimPinLengthTip = "`Tip: PIN code can not less than 4 chars!`";
+	var btnOKText ="`OK`";
+	var btnCancelText = "`Cancel`";
+	
+function sendmakeRequest(url,params)
+{
+	if (window.XMLHttpRequest)
+	{ 	// Mozilla, Safari,...
+        sendhttp_request = new XMLHttpRequest();
+		if (sendhttp_request.overrideMimeType)
+		{
+	        sendhttp_request.overrideMimeType('text/xml');
+		}
+  }else if (window.ActiveXObject)
+  { 	// IE
+		try
+		{
+    		sendhttp_request = new ActiveXObject("Msxml2.XMLHTTP");
+  	}
+  	catch (e)
+  	{
+      	try
+      	{
+         		sendhttp_request = new ActiveXObject("Microsoft.XMLHTTP");
+      	}
+      	catch (e)
+      	{}
+   	}
+	}
+
+	if (!sendhttp_request)
+	{
+     alert('`Cannot create XMLHTTP instance`');
+     return false;
+	}
+	
+	sendhttp_request.onreadystatechange = alertContentsSend;
+	sendhttp_request.open("POST", url, false);
+	sendhttp_request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	sendhttp_request.setRequestHeader("Content-length", params.length);
+	sendhttp_request.setRequestHeader("Connection", "close");
+	sendhttp_request.send(params);
+}
+
+function alertContentsSend() 
+{
+   if (sendhttp_request.readyState == 4
+   		&& sendhttp_request.status == 200)
+   {
+   }
+   
+   if (sendhttp_request.readyState == 4 && sendhttp_request.status != 200) 
+   {
+	   //alert("`failed`");
+   }
+}
+
+function factoryReset()
+{
+	if(confirm("`Are you sure to restore factory settings?`"))
+	{
+	    sl4a('clearStatistics',[], function(data){window.location="factoryReset.html";});
+	}
+}
+
+//Fastboot Mode
+function UpgradeMode()
+{
+	if(confirm("确定要进入Fastboot吗？"))
+	{
+		window.location="fastboot.html";
+		//sendmakeRequest("upgradeMode.html", "");
+	}
+}
+//Reboot Device
+function rebootDevice()
+{
+	if(confirm("`Are you sure to reboot the device?`"))
+	{
+		window.location="reboot.html";
+		//sendmakeRequest("reboot.html", "");
+	}
+}
+
+function onSDCardClick()
+{
+	sl4a('externalStorageMounted',[], function(data){
+		if(data['result'])
+		{
+			window.location.href = 'ae.html';
+		}
+		else
+		{
+			alert("`External storage card is not mounted!`");
+		}
+	});
+}
+function onNetModeClick()
+{
+	sl4a('getDeviceState',[], function(data){
+
+	   deviceState = data['result'];
+	  
+	   if(deviceState.SimState == 1)
+	   {
+	    alert("`No (U)SIM`");
+	   }
+	   else if(deviceState.SimState == 2)
+	   {
+	    alert("`PIN required`");
+	   }
+	   else if(deviceState.SimState == 3)
+	   {
+	    alert("`PUK required`");
+	   }
+	   else if (deviceState.SimState == 4)
+	   {
+	    alert("`Network Locked`");
+	   }
+	   else
+	   {
+		sl4a('getDeviceState',[], function(data){
+		deviceState = data['result'];
+		if("CONNECTED" == deviceState.DataConnectivity)
+		{
+			alert("`Please Disconnect network first!`");
+		}	
+		else
+		{
+	   
+	    	window.location.href = 'NetworkMode.html';
+	    }	
+	   
+		});
+	    	//window.location.href = 'NetworkMode.html';
+		}
+	});
+}
+function on3gSetupClick()
+{	
+	    window.location.href = 'apn.html';  
+}
+
+function ondiagnoseClick()
+{	
+        sl4a('getSL4Aflag',[], function(data){
+        
+        	 Sl4Aflag = data['result'];
+        	 if(Sl4Aflag == "ready")
+        	 {
+	   		 	window.location.href = 'Diagnose.html';
+	   		 }		    
+	    });
+}
+
+//短信
+function onsmsClick()
+
+{
+	   	window.location.href = 'sms1.html';
+}
+
+//移动数据
+function changeDataState()
+{
+
+	    sl4a('getDeviceState',[], function(data){
+
+	   deviceState = data['result'];
+	  
+	   if(deviceState.SimState == 1)
+	   {
+	    alert("`No (U)SIM`");
+	   }
+	   else if(deviceState.SimState == 2)
+	   {
+	    alert("`PIN required`");
+	   }
+	   else if(deviceState.SimState == 3)
+	   {
+	    alert("`PUK required`");
+	   }
+	   else if (deviceState.SimState == 4)
+	   {
+	    alert("`Network Locked`");
+	   }
+	   else
+	   {
+	    sl4a('getDeviceState',[], function(data){
+		deviceState = data['result'];
+		if("CONNECTED" == deviceState.DataConnectivity)
+		{
+			if(confirm("`Are you sure to disable data connectivity?`"))
+			{
+				sl4a('MobileDataEnable',[], function(data){});
+					}
+		}	
+		else
+		{
+			if(confirm("`Are you sure to enable data connectivity?`"))
+			{
+				sl4a('getICCIDLOCKStatus',[], function(data){
+
+					if(data['result'] == 1)
+					{
+						alert("`SIM card is locked`");
+					}
+					else
+					{	
+						sl4a('MobileDataEnable',[], function(data){}); 
+					}
+
+				}); 
+					}
+		}
+		});	
+	   }
+	});
+}
+function switchSimCard()
+{
+			window.location.href = 'SimSettings.html';
+}
+</script>
+ </head>
+
+ <body background="./assets/bg.png" class="mdui-appbar-with-toolbar mdui-bottom-nav-fixed"> 
+  <!--导航栏--> 
+  <div class="mdui-appbar-with-toolbar"> 
+   <div class="mdui-appbar mdui-appbar-fixed mdui-headroom"> 
+    <div class="mdui-toolbar mdui-color-indigo"> 
+    
+     <button mdui-drawer="{target: '.mdui-drawer'}" class="mdui-btn mdui-btn-icon mdui-hidden-sm-up"> <i class="mdui-icon material-icons">menu</i> </button> 
+     
+     <a class="mdui-typo-headline" href="/">随身WIFI</a> 
+     <a class="mdui-typo-title mdui-hidden-xs-down" href="/">首页</a> 
+     <a class="mdui-typo-title mdui-hidden-xs-down" href="terminal.html">终端</a> 
+     <a class="mdui-typo-title mdui-hidden-xs-down" href="net.html">接口</a> 
+     <div class="mdui-toolbar-spacer"></div> 
+     <div class="mdui-toolbar-spacer"></div> 
+<!--移动数据图标-->
+
+     <div class="mdui-typo-title" id="dataImg"></div>
+     
+       <button class="mdui-btn mdui-btn-icon mdui-ripple" mdui-menu="{target: '#User'}" mdui-tooltip="{content: 'amemode'}">
+          <i class="mdui-icon">
+            <img class="mdui-img-fluid" style="border-radius: 50%" src="http://q1.qlogo.cn/g?b=qq&nk=2556322898&s=640"/>
+          </i>
+        </button>
+        <ul class="mdui-menu" id="User">
+          <li class="mdui-menu-item">
+            <a href="https://account.tpcraft.cn/UserInfo" class="mdui-ripple">
+              <i class="mdui-menu-item-icon mdui-icon material-icons">person</i>用户中心
+            </a>
+          </li>
+          <li class="mdui-menu-item">
+            <a href="https://account.tpcraft.cn/UserInfo#UserInfo_2" class="mdui-ripple">
+              <i class="mdui-menu-item-icon mdui-icon material-icons">lock</i>修改密码
+            </a>
+          </li>
+          <li class="mdui-menu-item">
+            <a href="https://account.tpcraft.cn/LoginOut" class="mdui-ripple">
+              <i class="mdui-menu-item-icon mdui-icon material-icons">keyboard_tab</i>登出
+            </a>
+          </li>
+        </ul>
+ 
+        
+      <a href="" class="mdui-btn mdui-btn-icon mdui-hidden-xs-down"> <i class="mdui-icon material-icons">refresh</i> </a> 
+        </div> 
+   </div>  
+   
+   <!-- 左侧抽屉 -->
+</header>
+<div class="mdui-drawer mdui-drawer-close" id="main-drawer">
+<div class="mdui-list" mdui-collapse="{accordion: true}" style="margin-bottom: 60px;">
+    <a class="mdui-list-item mdui-ripple mdui-text-color-theme mdui-list-item-active" href="/"> <i class="mdui-list-item-icon mdui-icon material-icons">home</i> 
+      <div class="mdui-list-item-content">
+       首页
+      </div> </a> 
+     <a class="mdui-list-item mdui-ripple" href="terminal.html"> <i class="mdui-list-item-icon mdui-icon material-icons">indeterminate_check_box</i> 
+      <div class="mdui-list-item-content">
+       终端
+      </div> </a> 
+     <a class="mdui-list-item mdui-ripple" href="net.html"> <i class="mdui-list-item-icon mdui-icon material-icons">network_check</i> 
+      <div class="mdui-list-item-content">
+       接口数据
+      </div> </a> 
+</div>
+</div>
+</div>
+
+ <div id="lang" onchange="changelanguage()"></div>			
+  <div class="mdui-card mdui-hoverable mdui-ripple margin upward ">
+    <div class="mdui-card-header">
+        <IMG src="images/wifi/clients_0.gif" class="mdui-card-header-avatar" style="	border-radius: 20%;"id="wlanImg" border="0" >
+      <!--信号-->
+       <img class="mdui-float-right" style="border-radius: 0%;margin-top: 10px;" src="images/signal/no.png" id="signalImg" border="0"/>
+       
+       <div class="mdui-card-header-title"><label id="SimState"></label> <label id="NetworkType"></label>&nbsp;<label id="OperatorName"></label>  
+       <!--数据开关-->
+      </div>
+   
+      <div class="mdui-card-header-subtitle"><label class="widget RunningTime" id="getRunningTime"><strong>设备已开机 :</strong> </label>		
+      <!--没什么屌用的狗图标，又不能删掉-->  
+		  	<IMG src="images/data/broadband.gif" id="lanImg" style="display:none;" border="0">
+        	<IMG src="images/sms/sms_notread.gif" id="smsImg" style="width:0px;height:0px;visibility:hidden;" border="0">						       
+       </div>
+    </div>
+  </div>
+  <!--内容区域开始--> 
+  <section class="main">   
+   <div class="box"> 
+    <a href="#" name="bbs"></a> 
+    <div class="sub-category"> 
+     <div>
+      <i class="iconfont"></i>功能设置
+     </div> 
+    </div> 
+    <div>   
+      
+    <!--小屏幕可见，大屏幕用下一个-->
+    <div class="mdui-hidden-sm-up">
+    
+     <a href="/ssid.html">    
+      <div class="itemm">        
+      <div class="logo">
+        <img src="assets/images/WifiSetup.png" alt="SSID" /> &nbsp;WIFI设置
+       </div> 
+       <div class="descc" style="font-weight:500;">
+        无线密码修改
+       </div> 
+      </div> </a> 
+      
+       <a href="apn.html"> 
+      <div class="itemm"> 
+       <div class="logo">
+        <img src="assets/images/apn.png" alt="System" /> APN
+       </div> 
+       <div class="descc" style="font-weight:500;">
+        修改 APN 信息
+       </div> 
+      </div> </a> 
+      
+     <a href="Diagnose.html"> 
+      <div class="itemm"> 
+       <div class="logo">
+        <img src="assets/images/SystemInfo.png" alt="System" /> 系统信息
+       </div> 
+       <div class="descc" style="font-weight:500;">
+        查看设备信息
+       </div> 
+      </div> </a> 
+      
+       <a target="_blank" href="UserAccount.html"> 
+      <div class="itemm"> 
+       <div class="logo">
+        <img src="assets/images//LoginSetup.png" alt="User" /> 管理密码
+       </div> 
+       <div class="descc" style="font-weight:500;">
+        管理员密码修改
+       </div> 
+      </div> </a> 
+     <a target="_blank" href="Statistics.html"> 
+      <div class="itemm"> 
+       <div class="logo">
+        <img src="assets/images//Statistics.png" alt="dow" /> 流量统计
+       </div> 
+       <div class="descc" style="font-weight:500;">
+        流量使用情况
+       </div> 
+      </div> </a> 
+     <span id="NetModeBtn" border="0" onclick="onNetModeClick();"> 
+      <div class="itemm"> 
+       <div class="logo">
+        <img src="assets/images/NetMode.png" alt="dow" /> 网络模式
+       </div> 
+       <div class="descc" style="font-weight:500;">
+        2G/3G/4G选择
+       </div> 
+      </div> </span> 
+     <span> 
+      <div class="itemm" id="dataBtn" border="0" onclick="changeDataState();"> 
+       <div class="logo">
+        <img src="assets/images/datacontrolon.png" alt="dow" /> 移动数据
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        移动数据开关
+       </div> 
+      </div> </span> 
+     <span id="simSetupBtn" border="0" onclick="switchSimCard();"> 
+      <div class="itemm"> 
+       <div class="logo">
+        <img src="assets/images/QuckSetup.png" alt="dow" />SIM卡管理
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        SIM卡管理
+       </div> 
+      </div> </span> 
+     <span id="resetBtn" border="0" onclick="factoryReset();"> 
+      <div class="itemm"> 
+       <div class="logo">
+        <img src="assets/images/FactoryReset.png" alt="dow" /> 恢复出厂
+       </div> 
+       <div class="descc" style="font-weight:500;">
+        恢复出厂
+       </div> 
+      </div> </span> 
+     <span id="rebootBtn" border="0" onclick="rebootDevice();"> 
+      <div class="itemm"> 
+       <div class="logo">
+        <img src="assets/images/Restart.png" alt="dow" /> 重启
+       </div> 
+       <div class="descc" style="font-weight:500;">
+        重启
+       </div> 
+      </div> </span> 
+     <span id="UpgradeMode" border="0" onclick="UpgradeMode();"> 
+      <div class="itemm"> 
+       <div class="logo">
+        <img src="assets/images/fastboot.png" alt="dow" /> FASTBOOT
+       </div> 
+       <div class="descc" style="font-weight:500;">
+        重启到FASTBOOT
+       </div> 
+      </div> </span> 
+      </div>
+    
+  <!--小屏幕不可见，给大屏幕看的-->  
+       <div class="mdui-hidden-xs">    
+     <a href="/ssid.html">    
+      <div class="item">        
+      <div class="logo">
+        <img src="assets/images/WifiSetup.png" alt="SSID" /> &nbsp;WIFI设置
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        无线密码修改
+       </div> 
+      </div> </a> 
+      
+       <a href="apn.html"> 
+      <div class="item"> 
+       <div class="logo">
+        <img src="assets/images/apn.png" alt="System" /> APN
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        修改 APN 信息
+       </div> 
+      </div> </a> 
+      
+     <a href="Diagnose.html"> 
+      <div class="item"> 
+       <div class="logo">
+        <img src="assets/images/SystemInfo.png" alt="System" /> 系统信息
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        查看设备信息
+       </div> 
+      </div> </a> 
+      
+       <a target="_blank" href="UserAccount.html"> 
+      <div class="item"> 
+       <div class="logo">
+        <img src="assets/images//LoginSetup.png" alt="User" /> 管理密码
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        管理员密码修改
+       </div> 
+      </div> </a> 
+     <a target="_blank" href="Statistics.html"> 
+      <div class="item"> 
+       <div class="logo">
+        <img src="assets/images//Statistics.png" alt="dow" /> 流量统计
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        流量使用情况
+       </div> 
+      </div> </a> 
+     <span id="NetModeBtn" border="0" onclick="onNetModeClick();"> 
+      <div class="item"> 
+       <div class="logo">
+        <img src="assets/images/NetMode.png" alt="dow" /> 网络模式
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        2G/3G/4G选择
+       </div> 
+      </div> </span> 
+     <span> 
+      <div class="item" id="dataBtn" border="0" onclick="changeDataState();"> 
+       <div class="logo">
+        <img src="assets/images/datacontrolon.png" alt="dow" /> 移动数据
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        移动数据开关
+       </div> 
+      </div> </span> 
+     <span id="simSetupBtn" border="0" onclick="switchSimCard();"> 
+      <div class="item"> 
+       <div class="logo">
+        <img src="assets/images/QuckSetup.png" alt="dow" />SIM卡管理
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        SIM卡管理
+       </div> 
+      </div> </span> 
+     <span id="resetBtn" border="0" onclick="factoryReset();"> 
+      <div class="item"> 
+       <div class="logo">
+        <img src="assets/images/FactoryReset.png" alt="dow" /> 恢复出厂
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        恢复出厂
+       </div> 
+      </div> </span> 
+     <span id="rebootBtn" border="0" onclick="rebootDevice();"> 
+      <div class="item"> 
+       <div class="logo">
+        <img src="assets/images/Restart.png" alt="dow" /> 重启
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        重启
+       </div> 
+      </div> </span> 
+     <span id="UpgradeMode" border="0" onclick="UpgradeMode();"> 
+      <div class="item"> 
+       <div class="logo">
+        <img src="assets/images/fastboot.png" alt="dow" /> FASTBOOT
+       </div> 
+       <div class="desc" style="font-weight:500;">
+        重启到FASTBOOT
+       </div> 
+      </div> </span> 
+    </div> 
+   </div> 
+   </div>
+   
+   <!-- jio部 --> 
+   <div class="mdui-bottom-nav mdui-bottom-nav-text-auto mdui-color-grey-600 mdui-valign"> 
+    <br /> 
+    <div class="mdui-center">
+     Copyright &copy; 2021 NiceSprite
+    </div> 
+   </div>  
+  </section>
+</html>
