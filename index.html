@@ -4,11 +4,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
-    <title>Index</title>
+    <title>首页</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@1.0.2/dist/css/mdui.min.css"/>
     <script src="https://cdn.jsdelivr.net/npm/mdui@1.0.2/dist/js/mdui.min.js"></script>
 </head>
-    <body background="https://www.52craft.cn/bg.png" class="mdui-theme-primary-indigo mdui-theme-accent-pink">
+    <body class="mdui-theme-primary-indigo mdui-theme-accent-pink">
     <style>
      .radius{
       border-radius: 5px;
@@ -27,14 +27,15 @@
 </body>
 </br>
 <div class="mdui-card mdui-container radius">
-  <div class="mdui-card-content">MCPE.CC 如果有需要用二级域名的朋友，欢迎↓</div>
+  <div class="mdui-card-content"><div id="Showtime">Loading......</div>如果有需要用二级域名的朋友，欢迎↓</div>
 <div class="mdui-divider"></div>  
   <div class="mdui-card-actions">
     <a class="mdui-btn mdui-ripple radius" href="mailto:nicesprite@qq.com">联系我</a>
     </div>
 </div>
+
 <div class="footer">
-<div class="mdui-typo">
+ <div class="mdui-typo">
     <div class="mdui-card-content mdui-text-center">
       <small>
         Copyright &copy; 2021 <a href="https://github.com/NiceSprite34" target="_blank">NiceSprite</a> | 本站托管于Github
@@ -42,3 +43,16 @@
     </div>
   </div>
 </div>
+  <script>
+      var Showtime = function () {
+      var Nowtime = new Date();
+      var Endtime = new Date("2022/12/5");
+      var Lefttime = Endtime.getTime() - Nowtime.getTime();
+      var Leftd = Math.floor(Lefttime / (1000 * 60 * 60 * 24));
+      return "MCPE.CC 还有 " + Leftd + " 天 "  + " 过期 ";
+     }
+      setInterval (function () {
+      document.getElementById("Showtime").innerHTML = Showtime();
+    }, 1000);
+  </script>
+  </html>
